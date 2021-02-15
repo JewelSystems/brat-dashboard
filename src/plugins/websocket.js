@@ -54,6 +54,9 @@ export default function websocket(){
           case "updateIncentive":
             store.commit('layout/updateIncentive', payload.data);
             break;
+          case "getRunIncentives":
+            store.commit('layout/listRunIncentives', payload.data);
+            break;
 
 
           //Schedule communication

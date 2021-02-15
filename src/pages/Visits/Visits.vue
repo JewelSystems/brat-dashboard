@@ -7,7 +7,7 @@
       </small>
     </h1>
 
-    <Schedule/>
+    <Schedule v-if="this.permissions.includes('Admin')"/>
 
     <b-row v-if="this.permissions.includes('Admin')">
       <b-col>
@@ -44,7 +44,7 @@
       </b-col>
     </b-row>
 
-    <SubmittedRuns/>
+    <SubmittedRuns v-if="this.permissions.includes('Admin')"/>
 
     <b-row>
       <b-col>
@@ -166,8 +166,10 @@ export default {
     let wsPayload = {"endpoint":"getUserRuns", "id":this.curReq, info:{"id": this.id}};
     this.$store.commit('layout/SOCKET_SEND', wsPayload);
 
-    wsPayload = {"endpoint":"getEvents", "id":this.curReq};
-    this.$store.commit('layout/SOCKET_SEND', wsPayload);
+    if(this.permissions.includes('Admin')){
+      wsPayload = {"endpoint":"getEvents", "id":this.curReq};
+      this.$store.commit('layout/SOCKET_SEND', wsPayload);
+    }
   },
   components:{
     Widget,

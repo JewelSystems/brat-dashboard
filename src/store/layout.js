@@ -22,6 +22,7 @@ export default {
     userRuns: [],
     schedule: [],
     submittedRuns: [],
+    runIncentives: [],
 
     //current user
     id:'',
@@ -105,13 +106,18 @@ export default {
       state.extrasList = payload[0];
     },
     listUserRuns(state, payload){
-      state.userRuns = payload[0][0];
+      //state.userRuns = payload[0][0]; //js
+      //state.userRuns = payload[0]; //ts
+      
+      if(payload[0][0].length) state.userRuns = payload[0][0];
+      else state.userRuns = payload[0];
     },
     listSchedule(state, payload){
       state.schedule = payload[0];
     },
     //Submit Runs
     listSubmitRuns(state, payload){
+      //console.log(payload[0]);
       state.submittedRuns = payload[0];
     },
     updateSubmitRun(state, payload){
@@ -138,6 +144,9 @@ export default {
       incentive.BidwarOptions = payload[0].bidwar_options;
       incentive.comment = payload[0].comment;
       incentive.name = payload[0].name;
+    },
+    listRunIncentives(state, payload){
+      state.runIncentives = payload[0];
     },
 
 
@@ -192,6 +201,7 @@ export default {
       state.userRuns = [];
       state.schedule = [];
       state.submittedRuns = [];
+      state.runIncentives = [],
       router.push('/login');
     },
     wsState(state, curState){
@@ -223,24 +233,28 @@ export default {
     },
     async loadUser({ commit }, id){
       const user = await UserService.getUser(id);
-      //const wsPayload = {"endpoint":"getUser", "id":state.curReq, "info":{"id": id}};
-      //commit('SOCKET_SEND', wsPayload);
-      //console.log(user.data.res[0][0]);
+      //const userData = user.data.res[0]; //ts
+      //const userData = user.data.res[0][0]; //js
+
+      let userData = null;
+      if(user.data.res[0][0]) userData = user.data.res[0][0];
+      else userData = user.data.res[0];
+      
       commit('loadUser', {
         id: id,
-        first_name: user.data.res[0][0].first_name,
-        last_name: user.data.res[0][0].last_name,
-        username: user.data.res[0][0].username,
-        email: user.data.res[0][0].email,
-        gender: user.data.res[0][0].gender,
-        phone_number: user.data.res[0][0].phone_number,
-        stream_link: user.data.res[0][0].stream_link,
-        twitch: user.data.res[0][0].twitch,
-        twitter: user.data.res[0][0].twitter,
-        facebook: user.data.res[0][0].facebook,
-        instagram: user.data.res[0][0].instagram,
-        youtube: user.data.res[0][0].youtube,
-        permissions: user.data.res[0][0].permissions,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        username: userData.username,
+        email: userData.email,
+        gender: userData.gender,
+        phone_number: userData.phone_number,
+        stream_link: userData.stream_link,
+        twitch: userData.twitch,
+        twitter: userData.twitter,
+        facebook: userData.facebook,
+        instagram: userData.instagram,
+        youtube: userData.youtube,
+        permissions: userData.permissions,
       })
     },
     logoutAction({ commit }){
