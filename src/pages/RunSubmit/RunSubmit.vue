@@ -434,6 +434,7 @@ export default {
             wsPayload.info.incentives.push(this.form.incentives[idx]);
           }
         }
+
         this.$store.commit('layout/SOCKET_SEND', wsPayload);
         this.form.gameId = null;
         this.$router.push('/app/dashboard');
