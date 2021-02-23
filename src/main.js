@@ -12,11 +12,6 @@ import router from './Routes';
 import App from './App';
 import layoutMixin from './mixins/layout';
 import vuetify from './plugins/vuetify';
-//import * as dotenv from "dotenv";
-
-//dotenv.config();
-
-console.log('aqui: ', process.env);
 
 Vue.use(BootstrapVue);
 Vue.use(VCalendar, {

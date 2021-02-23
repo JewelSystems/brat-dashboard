@@ -1,5 +1,5 @@
 export default function websocket(){
-  const wss = new WebSocket('ws://localhost:3000');
+  const wss = new WebSocket(process.env.VUE_APP_WS_ADDRESS || 'ws://localhost:3000');
   return store => {
     wss.addEventListener('message', function (event){
       let payload = JSON.parse(event.data);
