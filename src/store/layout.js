@@ -23,6 +23,7 @@ export default {
     schedule: [],
     submittedRuns: [],
     runIncentives: [],
+    eventRunsList: [],
 
     //current user
     id:'',
@@ -114,6 +115,9 @@ export default {
     },
     listSchedule(state, payload){
       state.schedule = payload[0];
+    },
+    listEventRuns(state, payload){
+      state.eventRunsList = payload;
     },
     //Submit Runs
     listSubmitRuns(state, payload){

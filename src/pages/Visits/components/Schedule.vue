@@ -108,19 +108,11 @@
               </b-form-group>
 
               <div v-if="scheduleRowType === 'run'"> 
-                {{submittedRuns.filter(element => element.approved === 1 && element.reviewed === 1 && element.waiting === 0 && schedule.filter(schElement => schElement.event_run_id === element.id).length === 0) }}
-                <br/>
-                {{submittedRuns.filter(element => element.approved === 1 && element.reviewed === 1 && element.waiting === 0)}}
-                <br/>
-                {{schedule}}
-
-
-
                 <b-form-group label="Runs:">
                   <b-form-select id="runs-dropdown" v-model="selectedRun" class="md-2" variant="dark">
                     <b-form-select-option :value="null">Selecione uma run para adicionar ao cronograma.</b-form-select-option>
                     <b-form-select-option 
-                    v-for="run in submittedRuns.filter(element => element.approved === 1 && element.reviewed === 1 && element.waiting === 0 && schedule.filter(schElement => schElement.event_run_id === element.id).length === 0)" 
+                    v-for="run in submittedRuns.filter(element => eventRunsList.filter(el2 => el2.submit_run_id === element.id && schedule.filter(el3 => el3.event_run_id === el2.id).length === 0).length !== 0)" 
                     :key="run.id" 
                     :value="run.id">
                       {{run.id}}
@@ -138,7 +130,7 @@
                     v-for="extra in extrasList.filter(element => schedule.filter(schElement => schElement.event_extra_id === element.id).length === 0)" 
                     :key="extra.id" 
                     :value="extra.id">
-                      {{extra}}
+                      {{ extra.id }} - {{ extra.type }} {{ extra.name }}
                     </b-form-select-option>
                   </b-form-select>
                 </b-form-group>
@@ -276,6 +268,9 @@ export default {
     
     wsPayload = {"endpoint":"getEventExtras", "id":this.curReq};
     this.$store.commit('layout/SOCKET_SEND', wsPayload);
+
+    wsPayload = {"endpoint":"getEventRuns", "id":this.curReq};
+    this.$store.commit('layout/SOCKET_SEND', wsPayload);
   },
   methods:{
     //Create a row for an event run or an event extra
@@ -286,9 +281,11 @@ export default {
       let wsPayload = null;
       if(this.scheduleRowType === 'run'){
         wsPayload = {"endpoint":"createEventSchedule", "id":this.curReq, info:{"order": this.schedule.length+1, "type": 'run', "event_run_id": this.selectedRun, "event_extra_id": null, "extra_time": 0, shouldGetRun: true}};
+        this.selectedRun = null;
       }
       if(this.scheduleRowType === 'extra'){
         wsPayload = {"endpoint":"createEventSchedule", "id":this.curReq, info:{"order": this.schedule.length+1, "type": 'extra', "event_run_id": null, "event_extra_id": this.selectedExtra, "extra_time": 0}};
+        this.selectedExtra = null;
       }
       this.$store.commit('layout/SOCKET_SEND', wsPayload);
     },
@@ -491,6 +488,7 @@ export default {
       curReq: state => state.curReq,
       submittedRuns: state => state.submittedRuns,
       extrasList: state => state.extrasList,
+      eventRunsList: state => state.eventRunsList,
     }),
     schedule: {
       get() {
