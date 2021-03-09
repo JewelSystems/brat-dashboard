@@ -136,6 +136,20 @@
               </b-col>
             </b-form-row>
 
+            <b-form-row v-if="this.permissions.includes('Admin')">
+              <b-col cols="6">
+
+                <b-form-group label="Usuário">
+                  <b-form-select id="user-dropdown" v-model="selectedUser" class="md-2" variant="dark">
+                    <b-form-select-option :value="null">Selecione um usuário para associar à uma nova Run.</b-form-select-option>
+                    <b-form-select-option v-for="user in userList" :key="user.id" :value="user.id">{{user.username}}</b-form-select-option>
+                  </b-form-select>
+                </b-form-group>
+                <small>Caso queira criar uma run associada à sua conta, não selecione nada.</small>
+
+              </b-col>
+            </b-form-row>
+
             <!-- Incentives -->
             <b-form-row>
               <b-button variant="dark" class="auth-btn" size="sm" @click="showIncentives">
@@ -293,6 +307,7 @@ export default {
       ],
 
       //Variables that will be submitted on form
+      selectedUser: null,
       form: {
         category: '',
         estimatedTime: '',
@@ -373,6 +388,7 @@ export default {
 
     //Submit Request Methods
     async submit() {
+      console.log(this.selectedUser);
       if(this.inputValidation()){
         let formatTime = this.form.estimatedTime.split(':');
         let estimatedSeconds = 0;
@@ -398,10 +414,12 @@ export default {
         this.timeSlots.includes('noite') ? this.form.timeSlot += 1 : this.form.timeSlot += 0;
         this.timeSlots.includes('madrugada') ? this.form.timeSlot += 1 : this.form.timeSlot += 0;
 
+        const runnerId = this.selectedUser ? this.selectedUser : this.userId;
+
         let wsPayload = null;
         if(this.form.gameId !== null){
           wsPayload = {"endpoint":"createRun", "id":this.curReq, "info":{
-            "runner_id": this.userId,
+            "runner_id": runnerId,
 
             "game_id": this.form.gameId,
             "category": this.form.category, 
@@ -414,7 +432,7 @@ export default {
           };
         }else{
           wsPayload = {"endpoint":"createRunNGame", "id":this.curReq, "info":{
-            "runner_id": this.userId,
+            "runner_id": runnerId,
 
             "category": this.form.category, 
             "estimated_time": estimatedSeconds, 
@@ -437,6 +455,7 @@ export default {
 
         this.$store.commit('layout/SOCKET_SEND', wsPayload);
         this.form.gameId = null;
+        this.selectedUser = null;
         this.$router.push('/app/dashboard');
       }
     },
@@ -500,14 +519,18 @@ export default {
       curReq: state => state.curReq,
       gamesList: state => state.gamesList,
       userId: state => state.id,
+      permissions: state => state.permissions,
+      userList: state => state.userList,
     }),
   },
   async created(){
-    const wsPayload = {"endpoint":"getGames", "id":this.curReq, "info":{}};
+    let wsPayload = {"endpoint":"getGames", "id":this.curReq, "info":{}};
     this.$store.commit('layout/SOCKET_SEND', wsPayload);
     for(let game in this.gamesList){
       this.items.push(this.gamesList[game].name);
     }
+    wsPayload = {"endpoint":"getUsers", "id":this.curReq};
+    this.$store.commit('layout/SOCKET_SEND', wsPayload);
   },
   mounted(){
     document.addEventListener('click', this.handleClickOutside);

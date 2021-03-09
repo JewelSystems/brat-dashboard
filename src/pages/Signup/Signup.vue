@@ -298,6 +298,7 @@ export default {
         { text: 'Outro', value: 'O' }
       ],
       form:{ 
+        /*
         first_name: 'Vitor',
         last_name: 'Hardoim',
         username: 'vitorch',
@@ -314,7 +315,8 @@ export default {
         facebook: 'https://www.facebook.com/Stoneyoda/',
         instagram: 'https://www.instagram.com/stonedyoda/?hl=pt-br',
         youtube: 'https://www.youtube.com/channel/UCuhVlANZXUATGv1dRmwcUzA',
-       /*
+        */
+
         first_name: '',
         last_name: '',
         username: '',
@@ -331,7 +333,6 @@ export default {
         facebook: '',
         instagram: '',
         youtube: '',
-        */
       },
       errors: {
         first_name: null,

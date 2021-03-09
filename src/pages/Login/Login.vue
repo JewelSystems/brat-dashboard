@@ -78,13 +78,13 @@ export default {
   data() {
     return {
       form:{
+        /*
         username: 'admin',
         password: '12345678',
+        */
         
-        /*
         username: '',
         password: '',
-        */
       },
       errorMessage: null,
     };

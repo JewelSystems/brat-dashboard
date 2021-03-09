@@ -10,20 +10,20 @@
       ok-title="Cancelar"
       ok-only>
       <hr/>
-        <div v-if="submittedRuns[curRunId-1]">
+        <div v-if="curSubmitRun">
           <b-row>
-            <b-col>Runner: {{ submittedRuns[curRunId-1].runner }} </b-col>
+            <b-col>Runner: {{ curSubmitRun.runner }} </b-col>
           </b-row>
           <b-row>
-            <b-col>Jogo: {{ submittedRuns[curRunId-1].game_name }} </b-col>
+            <b-col>Jogo: {{ curSubmitRun.game_name }} </b-col>
           </b-row>
           <b-row>
             <b-col>
               <span>Status Atual: </span>
-              <b-badge v-if="getStatus(submittedRuns[curRunId-1].reviewed, submittedRuns[curRunId-1].approved, submittedRuns[curRunId-1].waiting) === 0" variant='gray'> Não Revisada </b-badge>
-              <b-badge v-if="getStatus(submittedRuns[curRunId-1].reviewed, submittedRuns[curRunId-1].approved, submittedRuns[curRunId-1].waiting) === 1" variant='success'> Aprovada </b-badge>
-              <b-badge v-if="getStatus(submittedRuns[curRunId-1].reviewed, submittedRuns[curRunId-1].approved, submittedRuns[curRunId-1].waiting) === 2" variant='primary'> Aprovada, na fila de espera </b-badge>
-              <b-badge v-if="getStatus(submittedRuns[curRunId-1].reviewed, submittedRuns[curRunId-1].approved, submittedRuns[curRunId-1].waiting) === 3" variant='danger'> Recusada </b-badge>
+              <b-badge v-if="getStatus(curSubmitRun.reviewed, curSubmitRun.approved, curSubmitRun.waiting) === 0" variant='gray'> Não Revisada </b-badge>
+              <b-badge v-if="getStatus(curSubmitRun.reviewed, curSubmitRun.approved, curSubmitRun.waiting) === 1" variant='success'> Aprovada </b-badge>
+              <b-badge v-if="getStatus(curSubmitRun.reviewed, curSubmitRun.approved, curSubmitRun.waiting) === 2" variant='primary'> Aprovada, na fila de espera </b-badge>
+              <b-badge v-if="getStatus(curSubmitRun.reviewed, curSubmitRun.approved, curSubmitRun.waiting) === 3" variant='danger'> Recusada </b-badge>
             </b-col>
           </b-row>
           <b-row>
@@ -212,6 +212,7 @@ export default {
   data() {
     return{
       curRunId: null,
+      curSubmitRun: null,
 
       showIncentives: true,
       toggleIncentive: {},
@@ -267,6 +268,7 @@ export default {
     reviewRun(id){
       this.evaluationError = '';
       this.curRunId = id;
+      this.curSubmitRun = this.submittedRuns.find(element => element.id === this.curRunId);
       this.$bvModal.show('review-run');
     },
     approve(){

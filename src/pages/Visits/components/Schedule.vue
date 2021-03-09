@@ -8,7 +8,6 @@
           :title="eventTitle"
           customHeader collapse
         >
-
           <!-- Modal Confirmations -->
           <b-modal 
             id='remove-row' 
@@ -89,6 +88,64 @@
             <p class="my-4">Ao confirmar, um tempo de setup será adicionado antes de todos os agendamentos.</p>
           </b-modal>
 
+          <b-modal 
+            id='add-schedule-row' 
+            title="Adicionar novo agendamento"
+            centered
+            ok-variant="dark"
+            cancel-variant="dark"
+            ok-title="Confirmar"
+            cancel-title="Cancelar"
+            @ok="addNewRow">
+              <!-- TODO Checar se já não existem em schedule(pelo id da schedule.row) -->
+              <b-form-group label="Escolha que tipo de agentamento deseja inserir: " v-slot="{ ariaDescribedby }" label-for="type">
+                <b-form-radio-group
+                  id="type"
+                  v-model="scheduleRowType" 
+                  :options="scheduleRowOption"
+                  :aria-describedby="ariaDescribedby"
+                ></b-form-radio-group>
+              </b-form-group>
+
+              <div v-if="scheduleRowType === 'run'"> 
+                {{submittedRuns.filter(element => element.approved === 1 && element.reviewed === 1 && element.waiting === 0 && schedule.filter(schElement => schElement.event_run_id === element.id).length === 0) }}
+                <br/>
+                {{submittedRuns.filter(element => element.approved === 1 && element.reviewed === 1 && element.waiting === 0)}}
+                <br/>
+                {{schedule}}
+
+
+
+                <b-form-group label="Runs:">
+                  <b-form-select id="runs-dropdown" v-model="selectedRun" class="md-2" variant="dark">
+                    <b-form-select-option :value="null">Selecione uma run para adicionar ao cronograma.</b-form-select-option>
+                    <b-form-select-option 
+                    v-for="run in submittedRuns.filter(element => element.approved === 1 && element.reviewed === 1 && element.waiting === 0 && schedule.filter(schElement => schElement.event_run_id === element.id).length === 0)" 
+                    :key="run.id" 
+                    :value="run.id">
+                      {{run.id}}
+                    </b-form-select-option>
+                  </b-form-select>
+                </b-form-group>
+              </div>
+
+              <div v-if="scheduleRowType === 'extra'"> 
+                <!-- {{extrasList}} -->
+                <b-form-group label="Extras:">
+                  <b-form-select id="extras-dropdown" v-model="selectedExtra" class="md-2" variant="dark">
+                    <b-form-select-option :value="null">Selecione um extra para adicionar ao cronograma.</b-form-select-option>
+                    <b-form-select-option 
+                    v-for="extra in extrasList.filter(element => schedule.filter(schElement => schElement.event_extra_id === element.id).length === 0)" 
+                    :key="extra.id" 
+                    :value="extra.id">
+                      {{extra}}
+                    </b-form-select-option>
+                  </b-form-select>
+                </b-form-group>
+              </div>
+
+          </b-modal>
+
         <!-- Schedule Creator -->
           <div class="table-resposive">
             <div class="clearfix">
@@ -127,7 +184,7 @@
                   <td v-else></td>
                   <td class="align-middle"> {{ row.id }}</td>
                   <td class="align-middle"> {{ formatHorary(row.event_date, row.duration, row.extra_time) }}</td>
-                  <td class="align-middle"> {{ row.game }} {{ row.order }}</td>
+                  <td class="align-middle"> {{ row.order }} - {{ row.game }} </td>
                   <td class="align-middle" v-if="row.type !== 'setup' || !dragEnabled"> {{ formatInterval(row.duration) }}</td>
                   <td class="align-middle" v-else>
                     <input
@@ -166,6 +223,7 @@
             <div v-else>A agenda está vazia!</div>
             <div class="clearfix">
               <div class="float-right">
+                <b-button v-show="dragEnabled" @click="newScheduleRow" variant="dark" style="margin-right: 10px">Adicionar agendamento no cronograma</b-button>
                 <b-button v-show="dragEnabled" @click="removeSetups" variant="dark" style="margin-right: 10px">Remover tempos de setup</b-button>
                 <b-button v-show="dragEnabled" @click="addSetups" variant="dark">Adicionar tempos de setup</b-button>
               </div>
@@ -199,14 +257,41 @@ export default {
       //Donation tab
       showDonation: false,
       donationRun: null,
+
+      //Insert a new row on the schedule
+      scheduleRowType: 'run',
+      scheduleRowOption:[
+        { text: 'Run', value: 'run' },
+        { text: 'Extra', value: 'extra' },
+      ],
+
+      //Add row
+      selectedExtra: null,
+      selectedRun: null,
     }
   },
   created(){
-    console.log('created');
-    const wsPayload = {"endpoint":"getEventSchedule", "id":this.curReq};
+    let wsPayload = {"endpoint":"getEventSchedule", "id":this.curReq};
+    this.$store.commit('layout/SOCKET_SEND', wsPayload);
+    
+    wsPayload = {"endpoint":"getEventExtras", "id":this.curReq};
     this.$store.commit('layout/SOCKET_SEND', wsPayload);
   },
   methods:{
+    //Create a row for an event run or an event extra
+    newScheduleRow(){
+      this.$bvModal.show('add-schedule-row');
+    },
+    addNewRow(){
+      let wsPayload = null;
+      if(this.scheduleRowType === 'run'){
+        wsPayload = {"endpoint":"createEventSchedule", "id":this.curReq, info:{"order": this.schedule.length+1, "type": 'run', "event_run_id": this.selectedRun, "event_extra_id": null, "extra_time": 0, shouldGetRun: true}};
+      }
+      if(this.scheduleRowType === 'extra'){
+        wsPayload = {"endpoint":"createEventSchedule", "id":this.curReq, info:{"order": this.schedule.length+1, "type": 'extra', "event_run_id": null, "event_extra_id": this.selectedExtra, "extra_time": 0}};
+      }
+      this.$store.commit('layout/SOCKET_SEND', wsPayload);
+    },
     //String Formatting
     formatInterval(time){
       if(!time) return ""
@@ -404,6 +489,8 @@ export default {
     ...mapState('layout', {
       permissions: state => state.permissions,
       curReq: state => state.curReq,
+      submittedRuns: state => state.submittedRuns,
+      extrasList: state => state.extrasList,
     }),
     schedule: {
       get() {
