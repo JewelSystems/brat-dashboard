@@ -29,7 +29,7 @@
                 <tr v-for="row in this.eventsList" :key="row.id">
                   <td v-if="row.active === `A`">{{row.id}}</td>
                   <td v-if="row.active === `A`">{{row.name}}</td>
-                  <td v-if="row.active === `A`"><a href="`${row.donation_link}`">{{row.donation_link}}</a></td>
+                  <td v-if="row.active === `A`"><a :href=row.donation_link>{{row.donation_link}}</a></td>
                   <td v-if="row.active === `A`">{{formatDate(row.start)}}</td>
                 </tr>
               </tbody>

@@ -44,7 +44,7 @@
       </a>
       <span v-if="collapse && state !== 'collapse'">
         <a href="#" @click="changeState($event, 'collapse')" :id="`collapseId-${randomId}`">
-          <i class="la la-angle-down"></i>
+          <i class="la la-angle-down" style="color: white"></i>
           <b-tooltip
             v-if="showTooltip"
             :placement="tooltipPlacement"
@@ -55,7 +55,7 @@
       </span>
       <span v-if="collapse && state === 'collapse'">
         <a href="#" @click="changeState($event, 'default')" :id="`expandId-${randomId}`">
-          <i class="la la-angle-up"></i>
+          <i class="la la-angle-up" style="color: white"></i>
           <b-tooltip
             v-if="showTooltip"
             :placement="tooltipPlacement"

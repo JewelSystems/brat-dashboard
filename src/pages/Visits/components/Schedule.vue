@@ -97,7 +97,6 @@
             ok-title="Confirmar"
             cancel-title="Cancelar"
             @ok="addNewRow">
-              <!-- TODO Checar se já não existem em schedule(pelo id da schedule.row) -->
               <b-form-group label="Escolha que tipo de agentamento deseja inserir: " v-slot="{ ariaDescribedby }" label-for="type">
                 <b-form-radio-group
                   id="type"
@@ -115,14 +114,13 @@
                     v-for="run in submittedRuns.filter(element => eventRunsList.filter(el2 => el2.submit_run_id === element.id && schedule.filter(el3 => el3.event_run_id === el2.id).length === 0).length !== 0)" 
                     :key="run.id" 
                     :value="run.id">
-                      {{run.id}}
+                      {{run.runner}} - {{run.game_name}} {{run.category}} {{run.platform}}
                     </b-form-select-option>
                   </b-form-select>
                 </b-form-group>
               </div>
 
-              <div v-if="scheduleRowType === 'extra'"> 
-                <!-- {{extrasList}} -->
+              <div v-if="scheduleRowType === 'extra'">
                 <b-form-group label="Extras:">
                   <b-form-select id="extras-dropdown" v-model="selectedExtra" class="md-2" variant="dark">
                     <b-form-select-option :value="null">Selecione um extra para adicionar ao cronograma.</b-form-select-option>
@@ -370,7 +368,6 @@ export default {
         //Multiple setups
         for(let idx = 0; idx < this.schedule.length; idx++){
           if(!(this.schedule[idx-1] && this.schedule[idx-1].type === 'setup' || this.schedule[idx].type === 'setup')){
-            console.log('a');
             const setup = {
               "type": "setup",
               "event_id": this.schedule[idx].event_id,
@@ -416,7 +413,6 @@ export default {
     confirmSetupRemotion(){
       for(let idx = 0; idx < this.schedule.length; idx++){
         if(this.schedule[idx].type === 'setup'){
-          console.log('removido em ', idx);
           this.deleteSchedule(idx);
           this.schedule.splice(idx, 1);
           idx--;
@@ -470,7 +466,6 @@ export default {
       }else{
         this.eventTitle = "<h5>Agenda <span class='fw-semi-bold'>do Evento</span></h5>";
       }
-      console.log('reloading page');
     },
     //Toggle Drag and Drop
     toggleDrag(){

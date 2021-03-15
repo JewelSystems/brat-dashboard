@@ -76,7 +76,7 @@ export default {
   },
   async created(){
     const wsPayload = {"endpoint":"getUsers", "id":this.curReq};
-    await this.$store.commit('layout/SOCKET_SEND', wsPayload);
+    this.$store.commit('layout/SOCKET_SEND', wsPayload);
   },
 };
 </script>

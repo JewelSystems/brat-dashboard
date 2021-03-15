@@ -68,7 +68,8 @@
             <i class="la la-sign-out" /> Log Out
           </b-dropdown-item-button>
           -->
-          <b-dropdown-item>TODO</b-dropdown-item>
+          <!-- TODO -->
+          <b-dropdown-item>Em construção</b-dropdown-item>
         </b-nav-item-dropdown>
 
         <!--

@@ -27,6 +27,9 @@ export default function websocket(){
             store.commit('layout/updateEvent', payload.data);
             break;
 
+          case "createEventExtra":
+            store.commit('layout/listExtras', payload.data);
+            break;
           case "getEventExtras":
             store.commit('layout/listExtras', payload.data);
             break;
@@ -35,6 +38,13 @@ export default function websocket(){
             break;
           case "getEventSchedule":
             store.commit('layout/listSchedule', payload.data);
+            break;
+          //Permissions
+          case "addPermission":
+            store.commit('layout/addPermission', payload.data);
+            break;
+          case "removePermission":
+            store.commit('layout/removePermission', payload.data);
             break;
           //SubmitRun
           case "getSubmitRuns":
@@ -57,8 +67,22 @@ export default function websocket(){
           case "getRunIncentives":
             store.commit('layout/listRunIncentives', payload.data);
             break;
-
-
+          //Runs
+          case "createRun":
+            if(payload.info.msg === "Server error"){
+              store.commit('layout/updateRunLoad', 'failed');
+            }else{
+              store.commit('layout/updateRunLoad', 'created');
+            }
+            break;
+          case "createRunNGame":
+            if(payload.info.msg === "Server error"){
+              store.commit('layout/updateRunLoad', 'failed');
+            }else{
+              store.commit('layout/updateRunLoad', 'created');
+            }
+            break;
+            
           //Schedule communication
           case "updateEventSchedule":
             store.commit('layout/updateScheduleList', payload.data[0].success);

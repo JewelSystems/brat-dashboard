@@ -162,12 +162,6 @@
             <small v-show="errors.password2" class="errormsg"> {{ errors.password2 ? errors.password2.split(":")[1] : "" }} </small>
           </b-form-group>
 
-          <h6>
-            Redes Sociais
-            <br>
-            <small>Opcionais</small>
-          </h6>
-
           <b-form-group label="" label-for="stream_link">
             <b-input-group>
               <b-input-group-text slot="prepend"><i class="la la-link text-white"></i></b-input-group-text>
@@ -178,11 +172,17 @@
                      class="form-control input-transparent pl-3"
                      type="text"
                      required
-                     placeholder="Transmissão"/>
+                     placeholder="Link da Transmissão"/>
               <i v-show="errors.stream_link" class="la la-exclamation-circle errorspan"></i>
             </b-input-group>
             <small v-show="errors.stream_link" class="errormsg"> {{ errors.stream_link ? errors.stream_link.split(": ")[1] : "" }} </small>
           </b-form-group>
+
+          <h6>
+            Redes Sociais
+            <br>
+            <small>Opcionais</small>
+          </h6>
           
           <b-form-group label="" label-for="twitch">
             <b-input-group>
@@ -310,6 +310,11 @@ export default {
         password1: '12345678',
         password2: '12345678',
         stream_link: 'https://www.twitch.tv/yoda',
+        twitch: 'https://www.twitch.tv/',
+        twitter: 'https://twitter.com/',
+        facebook: 'https://www.facebook.com/',
+        instagram: 'https://www.instagram.com/',
+        youtube: 'https://www.youtube.com/',
         twitch: 'https://www.twitch.tv/yoda',
         twitter: 'https://twitter.com/StoneDYooDa',
         facebook: 'https://www.facebook.com/Stoneyoda/',
@@ -328,11 +333,11 @@ export default {
         password1: '',
         password2: '',
         stream_link: '',
-        twitch: '',
-        twitter: '',
-        facebook: '',
-        instagram: '',
-        youtube: '',
+        twitch: 'https://www.twitch.tv/',
+        twitter: 'https://twitter.com/',
+        facebook: 'https://www.facebook.com/',
+        instagram: 'https://www.instagram.com/',
+        youtube: 'https://www.youtube.com/',
       },
       errors: {
         first_name: null,
@@ -356,6 +361,11 @@ export default {
   methods: {
     async submit() {
         if(this.inputValidation()){
+            if(this.form.twitch === '') this.form.twitch = 'https://www.twitch.tv/';
+            if(this.form.twitter === '') this.form.twitter = 'https://twitter.com/';
+            if(this.form.facebook === '') this.form.facebook = 'https://www.facebook.com/';
+            if(this.form.instagram === '') this.form.instagram = 'https://www.instagram.com/';
+            if(this.form.youtube === '') this.form.youtube = 'https://www.youtube.com/';
           const response = await UserService.postSignup(
             this.form.first_name,
             this.form.last_name,
@@ -433,28 +443,28 @@ export default {
         this.errors.password2 = 'Senha: As senhas são diferentes!';
         validationCheck = false
       } 
-      if(this.form.stream_link && !urlRegex.test(this.form.stream_link)){
-        this.errors.stream_link = 'Transmissão: Informe o endereço completo (http://google.com.br)';
+      if((this.form.stream_link && !urlRegex.test(this.form.stream_link)) || this.form.stream_link.length <= 0){
+        this.errors.stream_link = 'Transmissão: Informe o endereço completo (https://www.twitch.tv/)';
         validationCheck = false
       }
       if(this.form.twitch && !urlRegex.test(this.form.twitch)){
-        this.errors.twitch = "Twitch: Informe o endereço completo (http://google.com.br)";
+        this.errors.twitch = "Twitch: Informe o endereço completo (https://www.twitch.tv/)";
         validationCheck = false
       }
       if(this.form.twitter && !urlRegex.test(this.form.twitter)){
-        this.errors.twitter = 'Twitter: Informe o endereço completo (http://google.com.br)';
+        this.errors.twitter = 'Twitter: Informe o endereço completo (https://twitter.com/)';
         validationCheck = false
       }
       if(this.form.facebook && !urlRegex.test(this.form.facebook)){
-        this.errors.facebook = 'Facebook: Informe o endereço completo (http://google.com.br)';
+        this.errors.facebook = 'Facebook: Informe o endereço completo (https://www.facebook.com/)';
         validationCheck = false
       }
       if(this.form.instagram && !urlRegex.test(this.form.instagram)){
-        this.errors.instagram = 'Instagram: Informe o endereço completo (http://google.com.br)';
+        this.errors.instagram = 'Instagram: Informe o endereço completo (https://www.instagram.com/)';
         validationCheck = false
       }
       if(this.form.youtube && !urlRegex.test(this.form.youtube)){
-        this.errors.youtube = 'Youtube: Informe o endereço completo (http://google.com.br)';
+        this.errors.youtube = 'Youtube: Informe o endereço completo (https://www.youtube.com/)';
         validationCheck = false
       }
       
@@ -467,7 +477,7 @@ export default {
       }
 
       return validationCheck;
-    }
+    },
   },
 };
 </script>

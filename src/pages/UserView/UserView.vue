@@ -1,47 +1,46 @@
 <template>
   <div>
-    <h1 class="page-title">User Info &nbsp;
-      <small>
-        <small>Template</small>
-      </small>
+    <h1 class="page-title">Informações de {{ user.username }} &nbsp;
     </h1>
       <b-row>
         <b-col>
           <Widget 
-          title="<h5>User <span class='fw-semi-bold'>Info</span></h5>"
+          title="<h5>Informações do <span class='fw-semi-bold'>Usuário</span></h5>"
           customHeader>
-            <div>Name: {{this.user.first_name}}</div>
-            <div>Last Name: {{this.user.last_name}}</div>
-            <div>Username: {{this.user.username}}</div>
+            <div>Nome: {{this.user.first_name}}</div>
+            <div>Sobrenome: {{this.user.last_name}}</div>
+            <div>Usuário: {{this.user.username}}</div>
             <div>Email: {{this.user.email}}</div>
             <div>
-              Permissions: 
+              Permissões: 
               <small v-for="permission in this.user.permissions" :key="permission">
-                <b-badge v-if="permission === 'Admin'" variant="success"><a @click="removePermission(permission)">{{permission}}</a></b-badge>
-                <b-badge v-else-if="permission === 'Tech'" variant="primary"><a @click="removePermission(permission)">{{permission}}</a></b-badge>
-                <b-badge v-else-if="permission === 'Financ'" variant="danger"><a @click="removePermission(permission)">{{permission}}</a></b-badge>
-                <b-badge v-else-if="permission === 'Staff-Brat2021-Lead'" variant="warning"><a @click="removePermission(permission)">{{permission}}</a></b-badge>
+                <b-badge v-if="permission === 'Admin'" variant="success">{{permission}}<a @click="removePermission(permission)"><i class="la la-close"></i></a></b-badge>
+                <b-badge v-else-if="permission === 'Tech'" variant="primary">{{permission}}<a @click="removePermission(permission)"><i class="la la-close"></i></a></b-badge>
+                <b-badge v-else-if="permission === 'Financ'" variant="danger">{{permission}}<a @click="removePermission(permission)"><i class="la la-close"></i></a></b-badge>
+                <b-badge v-else-if="permission === 'Staff-Brat2021-Lead'" variant="warning">{{permission}}<a @click="removePermission(permission)"><i class="la la-close"></i></a></b-badge>
+                <b-badge v-else-if="permission === 'None'"></b-badge>
                 <b-badge v-else-if="permission === ''"></b-badge>
-                <b-badge v-else variant="light"><a @click="removePermission(permission)">{{permission}}</a></b-badge>
+                <b-badge v-else variant="light">{{permission}}<a @click="removePermission(permission)"><i class="la la-close"></i></a></b-badge>
+                <span style="margin-left: 5px"/>
               </small>
             </div>
-
+             
             <div>
-              <b-form-select id="permission-dropdown" v-model="selectedPermission" class="md-2" variant="dark">
-                <option value="Admin">Admin</option>
-                <option value="Tech">Tech</option>
-                <option value="Financ">Financ</option>
-                <option value="Staff-Brat2021-Lead">Staff-Brat2021-Lead</option>
-                <option value="Comentarista-Brat2021">Comentarista-Brat2021</option>
-                <option value="Runner-Brat2021">Runner-Brat2021</option>
-                <option value="Host-Brat2021">Host-Brat2021</option>
-              </b-form-select>
-              <b-button variant="dark" @click="addPermission()">Add Permission</b-button>
+              <b-form-select id="runs-dropdown" v-model="selectedPermission" class="md-2" variant="dark">
+                    <b-form-select-option :value="null">Selecione uma permissão para adicionar ao usuário.</b-form-select-option>
+                    <b-form-select-option 
+                    v-for="permission in allPermissions.filter(x => !this.user.permissions.includes(x))" 
+                    :key="permission" 
+                    :value="permission">
+                      {{permission}}
+                    </b-form-select-option>
+                  </b-form-select>
+              <b-button variant="dark" @click="addPermission()">Adicionar Permissão</b-button>
             </div>
 
             <br>
             <h3>
-              Permissions Info:
+              Detalhes das permissões:
             </h3>
             <div>Admin: </div>
             <div>Tech: </div>
@@ -69,6 +68,16 @@ export default {
         id: String(this.$route.params.id),
         user:  null,
         selectedPermission: '',
+
+        allPermissions: [
+          "Admin",
+          "Tech",
+          "Financ",
+          "Staff-Brat2021-Lead",
+          "Comentarista-Brat2021",
+          "Runner-Brat2021",
+          "Host-Brat2021"
+        ]
       }
   },
   created(){
@@ -85,13 +94,13 @@ export default {
   methods: {
     async removePermission(permission){
       const wsPayload = {"endpoint":"removePermission", "id":this.curReq, "info":{"updated_user": this.user.id, "updater_user": this.curUserId, "permission": permission}};
-      await this.$store.commit('layout/SOCKET_SEND', wsPayload);
-      //console.log("permissão removida: " + permission);
+      this.$store.commit('layout/SOCKET_SEND', wsPayload);
     },
     async addPermission(){
       if(this.selectedPermission !== ''){
         const wsPayload = {"endpoint":"addPermission", "id":this.curReq, "info":{"updated_user": this.user.id, "updater_user": this.curUserId, "permission": this.selectedPermission}};
-        await this.$store.commit('layout/SOCKET_SEND', wsPayload);
+        this.$store.commit('layout/SOCKET_SEND', wsPayload);
+        this.selectedPermission = null;
       }
     }
   }

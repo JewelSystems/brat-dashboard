@@ -8,6 +8,25 @@
           title="<h5>Crie <span class='fw-semi-bold'>uma run</span></h5>"
           customHeader
         >
+
+          <!-- Modal Loading -->
+          <b-modal 
+            id='loading-creation' 
+            title="Criando run"
+            centered
+            ok-variant="dark"
+            ok-only
+            ok-title="Cancelar"
+            class="mx-auto bg-info">
+              <p v-if="newRunLoad === 'waiting'" class="my-4"> <b-spinner label="Loading..."></b-spinner> </p>
+              <p v-if="newRunLoad === 'created'" class="my-4"> Run criada com sucesso! </p>
+              <b-button v-if="newRunLoad === 'created'" @click="keepCreating()" style="margin-right: 10px" variant="dark">Continuar criando</b-button>
+              <b-button v-if="newRunLoad === 'created'" @click="backHome()" style="margin-right: 10px" variant="dark">Voltar para home</b-button>
+
+              <p v-if="newRunLoad === 'failed'" class="my-4"> A criação da run falhou por problemas no servidor! </p>
+              <b-button v-if="newRunLoad === 'failed'" @click="tryAgain()" style="margin-right: 10px" variant="dark">Tentar novamente</b-button>
+          </b-modal>
+
           <form novalidate class="mt" @submit.prevent="submit">
             <div id="error-block" v-show="errorMessage"></div>
             <!-- Autocomplete Input -->
@@ -341,15 +360,28 @@ export default {
         gameId: null,
         gameName: null,
         gameYear: null
-      }
+      },
+      incentiveErrors: null
     }
   },
   methods: {
     //Autocomplete Methods
+    test(){
+      console.log('select');
+    },
     handleClickOutside(evt) {
       if(evt.target.id !== "gameName"){
         this.isOpen = false;
         this.arrowCounter = -1;
+      }
+    },
+    handleClickInside(evt) {
+      if(evt.target.id === "gameName"){
+        const temp = [];
+        for(let game in this.gamesList){
+          temp.push(this.gamesList[game].name);
+        }
+        this.items = temp;
       }
     },
     onArrowDown() {
@@ -388,8 +420,8 @@ export default {
 
     //Submit Request Methods
     async submit() {
-      console.log(this.selectedUser);
       if(this.inputValidation()){
+
         let formatTime = this.form.estimatedTime.split(':');
         let estimatedSeconds = 0;
         if(formatTime[0]) estimatedSeconds += Number(formatTime[0]) * 3600;
@@ -454,9 +486,7 @@ export default {
         }
 
         this.$store.commit('layout/SOCKET_SEND', wsPayload);
-        this.form.gameId = null;
-        this.selectedUser = null;
-        this.$router.push('/app/dashboard');
+        this.$bvModal.show('loading-creation');
       }
     },
     inputValidation(){
@@ -465,6 +495,7 @@ export default {
       for(let element in this.errors){
         this.errors[element] = null;
       }
+      this.incentiveErrors = null;
 
       if(!this.form.gameName || /^\s*$/.test(this.form.gameName)) {
         this.errors.gameName = 'Nome do jogo: Campo obrigatório';
@@ -487,11 +518,32 @@ export default {
         validationCheck = false
       }
 
+      if(this.toggleIncentives){
+        for(let incentive of this.form.incentives){
+          if(incentive.comment === '' || incentive.name === ''){
+            this.incentiveErrors = 'Incentivos inválidos';
+            validationCheck = false;
+            continue;
+          }
+          if(incentive.type === 'private'){
+            console.log('private');
+            for(let option of incentive.options){
+              if(option.name === ''){
+                this.incentiveErrors = 'Incentivos inválidos';
+                validationCheck = false;
+                continue;
+              }
+            }
+          }
+        }
+      }
+
       if (!validationCheck){
         this.errorMessage = 'Os seguintes campos estão inválidos: ';
         for(let error in this.errors){
           if(this.errors[error]) this.errorMessage = this.errorMessage + `<br><small><i class="fa fa-circle"></i></small> ` + this.errors[error];
         }
+        this.errorMessage += `<br><small><i class="fa fa-circle"></i></small> ` + this.incentiveErrors;
         document.getElementById('error-block').innerHTML = `<div role="alert" aria-live="polite" aria-atomic="true" class="alert alert-sm alert-danger">${this.errorMessage}</div>`;
       }
       return validationCheck;
@@ -512,6 +564,42 @@ export default {
     },
     removeOption(idx, option_idx){
       this.form.incentives[idx].options.splice(option_idx, 1);
+    },
+
+    //Loading modal
+    keepCreating(){
+      this.selectedUser = null;
+      this.form.category = '',
+      this.form.estimatedTime = '',
+      this.form.timeSlot = '',
+      this.form.platform = '',
+
+      this.form.gameId = null,
+      this.form.gameName = '',
+      this.form.gameYear = '',
+
+      this.form.incentives = [
+        {
+          type: 'none',
+          comment: '',
+          name: '',
+          options: [
+            {
+              name: '',
+            },
+          ]
+        },
+      ]
+      this.$bvModal.hide('loading-creation');
+      this.$store.commit('layout/updateRunLoad', 'waiting');
+    },
+    tryAgain(){
+      this.$store.commit('layout/updateRunLoad', 'waiting');
+      this.submit()
+    },
+    backHome(){
+      this.keepCreating();
+      this.$router.push('/app/dashboard');
     }
   },
   computed:{
@@ -521,6 +609,7 @@ export default {
       userId: state => state.id,
       permissions: state => state.permissions,
       userList: state => state.userList,
+      newRunLoad: state => state.newRunLoad,
     }),
   },
   async created(){
@@ -534,9 +623,11 @@ export default {
   },
   mounted(){
     document.addEventListener('click', this.handleClickOutside);
+    document.addEventListener('click', this.handleClickInside);
   },
   destroyed() {
     document.removeEventListener('click', this.handleClickOutside);
+    document.addEventListener('click', this.handleClickInside);
   }
 };
 </script>

@@ -39,10 +39,26 @@ export default {
     facebook: '',
     instagram: '',
     youtube: '',
-    permissions: ['admin'],
+    permissions: [], //TODO tinha um 'admin' dentro do vetor
+    
+    //Loads
+    newRunLoad: 'waiting',
   },
 
   mutations: {
+    addPermission(state, value){
+      state.permissions.push(value[0]);
+      state.userList.find(element => Number(element.id) === Number(state.id)).permissions.push(value[0]);
+    },
+    removePermission(state, value){
+
+      state.permissions.splice(state.permissions.indexOf(value[0]), 1);
+      console.log(state.permissions);
+      state.userList.find(element => Number(element.id) === Number(state.id)).permissions.splice(state.permissions.indexOf(value[0]), 1);
+    },
+    updateRunLoad(state, value){
+      state.newRunLoad = value;
+    },
     switchSidebar(state, value) {
       if (value) {
         state.sidebarClose = value;
@@ -73,7 +89,7 @@ export default {
       state.facebook = facebook;
       state.instagram = instagram;
       state.youtube = youtube;
-      state.permissions = permissions;
+      state.permissions = permissions.split(',');
     },
     authenticate(state){
       state.authenticate = true;
@@ -96,22 +112,29 @@ export default {
       state.eventsList.push(payload[0]);
     },
     updateEvent(state, payload){
-      state.eventsList.filter(element => element.id === payload[0].id)[0].active = payload[0].active;
-      state.eventsList.filter(element => element.id === payload[0].id)[0].donation_link = payload[0].donation_link;
-      state.eventsList.filter(element => element.id === payload[0].id)[0].end = payload[0].end;
-      state.eventsList.filter(element => element.id === payload[0].id)[0].name = payload[0].name;
-      state.eventsList.filter(element => element.id === payload[0].id)[0].start = payload[0].start;
+      let event = state.eventsList.find(element => Number(element.id) === Number(payload[0].id));
+      console.log('lista: ', state.eventsList);
+      console.log('id: ', payload[0].id);
+      console.log('evento: ', event);
+      event.active = payload[0].active;
+      event.donation_link = payload[0].donation_link;
+      event.end = payload[0].end;
+      event.name = payload[0].name;
+      event.start = payload[0].start;
     },
 
     listExtras(state, payload){
       state.extrasList = payload[0];
     },
+    addEventExtra(state, payload){
+      console.log(payload);
+    },
     listUserRuns(state, payload){
       //state.userRuns = payload[0][0]; //js
-      //state.userRuns = payload[0]; //ts
+      state.userRuns = payload[0]; //ts
       
-      if(payload[0][0].length) state.userRuns = payload[0][0];
-      else state.userRuns = payload[0];
+      //if(payload[0][0].length) state.userRuns = payload[0][0];
+      //else state.userRuns = payload[0];
     },
     listSchedule(state, payload){
       state.schedule = payload[0];
