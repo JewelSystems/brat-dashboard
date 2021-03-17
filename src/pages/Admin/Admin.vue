@@ -8,7 +8,7 @@
           customHeader
         >
           <div class="table-resposive">
-            <table class="table">
+            <table class="table" v-if="this.userList.length !== 0">
               <thead>
                 <tr>
                   <th class="hidden-sm-down">#id</th>
@@ -44,6 +44,9 @@
                 </tr>
               </tbody>
             </table>
+            <div v-else>
+              Não existe nenhum usuário cadastrado.
+            </div>
           
           
           </div>

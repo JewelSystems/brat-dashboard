@@ -8,7 +8,7 @@
           customHeader
         >
           <div class="table-resposive">
-            <table class="table">
+            <table class="table" v-if="this.extrasList.length !== 0">
               <thead>
                 <tr>
                   <th class="hidden-sm-down">#id</th>
@@ -26,6 +26,9 @@
                 </tr>
               </tbody>
             </table>
+            <div v-else>
+              Não existe nenhum extra cadastrado!
+            </div>
           </div>
           <div class="clearfix">
             <div class="float-right">

@@ -16,7 +16,8 @@
           customHeader collapse
         >
           <div class="table-resposive">
-            <table class="table">
+            {{ getActiveEvent() }}
+            <table class="table" v-if="activeEvent !== undefined">
               <thead>
                 <tr>
                   <th class="hidden-sm-down">#id</th>
@@ -26,14 +27,25 @@
                 </tr>
               </thead>
               <tbody>
+                <tr>
+                  <td>{{activeEvent.id}}</td>
+                  <td>{{activeEvent.name}}</td>
+                  <td><a :href=activeEvent.donation_link>{{activeEvent.donation_link}}</a></td>
+                  <td>{{formatDate(activeEvent.start)}}</td>
+                </tr>
+                <!--
                 <tr v-for="row in this.eventsList" :key="row.id">
                   <td v-if="row.active === `A`">{{row.id}}</td>
                   <td v-if="row.active === `A`">{{row.name}}</td>
                   <td v-if="row.active === `A`"><a :href=row.donation_link>{{row.donation_link}}</a></td>
                   <td v-if="row.active === `A`">{{formatDate(row.start)}}</td>
                 </tr>
+                -->
               </tbody>
             </table>
+            <div v-else>
+              <span>Não existe nenhum evento ativo!</span>
+            </div>
           </div>
           <div class="clearfix">
             <div class="float-right">
@@ -105,6 +117,7 @@ export default {
   name: 'Visits',
   data() {
     return{
+      activeEvent: undefined,
     }
   },
   methods: {
@@ -151,6 +164,9 @@ export default {
         return resp;
       }
       return '';
+    },
+    getActiveEvent(){
+      this.activeEvent = this.eventsList.find(element => element.active === "A");
     }
   },
   computed: {
