@@ -47,14 +47,17 @@ export default {
 
   mutations: {
     addPermission(state, value){
-      state.permissions.push(value[0]);
-      state.userList.find(element => Number(element.id) === Number(state.id)).permissions.push(value[0]);
+      state.userList.find(element => Number(element.id) === Number(value[0].user_id)).permissions.push(value[0].permission);
+      if(value[0].user_id === state.id){
+        state.permissions.push(value[0].permission);
+      }
     },
     removePermission(state, value){
-
-      state.permissions.splice(state.permissions.indexOf(value[0]), 1);
-      console.log(state.permissions);
-      state.userList.find(element => Number(element.id) === Number(state.id)).permissions.splice(state.permissions.indexOf(value[0]), 1);
+      const userPermissions = state.userList.find(element => Number(element.id) === Number(value[0].user_id)).permissions;
+      userPermissions.splice(userPermissions.indexOf(value[0].permission), 1);
+      if(value[0].user_id === state.id){
+        state.permissions.splice(state.permissions.indexOf(value[0].permission), 1);
+      }
     },
     updateRunLoad(state, value){
       state.newRunLoad = value;
@@ -148,16 +151,47 @@ export default {
       state.submittedRuns = payload[0];
     },
     updateSubmitRun(state, payload){
-      state.submittedRuns.filter(element => element.id === payload[0].id)[0].reviewed = payload[0].reviewed;
-      state.submittedRuns.filter(element => element.id === payload[0].id)[0].approved = payload[0].approved;
-      state.submittedRuns.filter(element => element.id === payload[0].id)[0].waiting = payload[0].waiting;
+      let submittedRun = state.submittedRuns.find(element => element.id === payload[0].id);
+      submittedRun.reviewed = payload[0].reviewed;
+      submittedRun.approved = payload[0].approved;
+      submittedRun.waiting = payload[0].waiting;
+      if(payload[0].reviewed === true){
+        if(payload[0].approved === false){
+          for(const idx in state.eventRunsList){
+            if(state.eventRunsList[idx].submit_run_id === payload[0].id){
+              state.eventRunsList.splice(idx, 1);
+              break;
+            }
+          }
+        }else{
+          state.eventRunsList.push({
+            approved: payload[0].approved,
+            id: payload[0].event_run.id,
+            reviewed: payload[0].reviewed,
+            run_id: payload[0].event_run.run_id,
+            submit_run_id: payload[0].id,
+            waiting: payload[0].waiting,
+          });
+        }
+      }
     },
     updateSubmitRunIncentives(state, payload){
-      state.submittedRuns.filter(element => element.id === payload[0].id)[0].reviewed = payload[0].reviewed;
-      state.submittedRuns.filter(element => element.id === payload[0].id)[0].approved = payload[0].approved;
-      state.submittedRuns.filter(element => element.id === payload[0].id)[0].waiting = payload[0].waiting;
-      state.submittedRuns.filter(element => element.id === payload[0].id)[0].approved_incentives = payload[0].approved_incentives;
-      state.submittedRuns.filter(element => element.id === payload[0].id)[0].goals = payload[0].goals;
+      let submittedRun = state.submittedRuns.find(element => element.id === payload[0].id);
+      submittedRun.reviewed = payload[0].reviewed;
+      submittedRun.approved = payload[0].approved;
+      submittedRun.waiting = payload[0].waiting;
+      submittedRun.approved_incentives = payload[0].approved_incentives;
+      submittedRun.goals = payload[0].goals;
+      if(payload[0].reviewed === true && payload[0].approved === true){
+        state.eventRunsList.push({
+          approved: payload[0].approved,
+          id: payload[0].event_run_id,
+          reviewed: payload[0].reviewed,
+          run_id: payload[0].event_run_run_id,
+          submit_run_id: payload[0].id,
+          waiting: payload[0].waiting,
+        });
+      }
     },
     removeIncentives(state, payload){
       let incentives = state.submittedRuns.filter(element => element.id === payload[0].id)[0].approved_incentives;

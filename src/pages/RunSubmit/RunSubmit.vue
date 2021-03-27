@@ -1,11 +1,12 @@
 <template>
   <div>
+    {{ onReload() }}
     <h1 class="page-title">Envie suas runs! &nbsp;
     </h1>
     <b-row>
       <b-col>
         <Widget
-          title="<h5>Crie <span class='fw-semi-bold'>uma run</span></h5>"
+          :title="formTitle"
           customHeader
         >
 
@@ -198,11 +199,13 @@
                       <b-input-group>
                         <input :id="'name-'+idx"
                               v-model="form.incentives[idx].name" 
+                              v-bind:class="{ invalid: errors.incentives[idx].name !== null }"
                               :ref="'name-'+idx"
                               class="form-control input-transparent pl-3"
                               type="text"
                               placeholder=""/>
                       </b-input-group>
+                      <small v-show="errors.incentives[idx].name" class="errormsg"> {{ errors.incentives[idx].name }} <br></small>
                     </b-form-group>
                   </b-col>
 
@@ -228,6 +231,7 @@
 
                               <input :id="'type-'+idx+'-'+option_idx"
                                     v-model="form.incentives[idx].options[option_idx].name" 
+                                    v-bind:class="{ invalid: errors.incentives[idx].options[option_idx].name !== null }"
                                     :ref="'type-'+idx+'-'+option_idx"
                                     class="form-control input-transparent pl-3"
                                     type="text"
@@ -236,8 +240,8 @@
                               <button type="button" class="btn btn-default" @click="removeOption(idx, option_idx)" style="margin-left: 6px">
                                 <span class="glyphicon glyphicon-minus"></span>
                               </button>
-                          
                             </b-input-group>
+                            <small v-show="errors.incentives[idx].options[option_idx].name" class="errormsg"> {{ errors.incentives[idx].options[option_idx].name }} <br></small>
                           </b-form-group>
                         </b-form-row>
                       </div>
@@ -250,6 +254,7 @@
                       <b-input-group>
                         <textarea :id="'comment-'+idx"
                               v-model="form.incentives[idx].comment" 
+                              v-bind:class="{ invalid: errors.incentives[idx].comment !== null }"
                               :ref="'comment-'+idx"
                               class="form-control input-transparent pl-3"
                               type="textarea"
@@ -258,6 +263,7 @@
                               style="resize: none;"
                               placeholder=""/>
                       </b-input-group>
+                      <small v-show="errors.incentives[idx].comment" class="errormsg"> {{ errors.incentives[idx].comment }} <br></small>
                     </b-form-group>
                   </b-col>
 
@@ -299,6 +305,9 @@ export default {
   name: 'RunSubmit',
   data() {
     return {
+      //Table title
+      formTitle: '',
+        
       //Submit Error Message
       errorMessage: null,
 
@@ -359,12 +368,27 @@ export default {
 
         gameId: null,
         gameName: null,
-        gameYear: null
+        gameYear: null,
+
+        incentives: [
+          {
+            comment: null,
+            name: null,
+            options: [
+              {
+                name: null,
+              },
+            ]
+          },
+        ]
       },
       incentiveErrors: null
     }
   },
   methods: {
+    onReload(){
+      this.formTitle = "<h5>Enviar <span class='fw-semi-bold'>uma run para o evento "+ this.eventsList.find(element => element.active === "A").name +"</span></h5>";
+    },
     //Autocomplete Methods
     test(){
       console.log('select');
@@ -493,7 +517,17 @@ export default {
       let validationCheck = true;
 
       for(let element in this.errors){
-        this.errors[element] = null;
+        if(element != 'incentives' ){
+          this.errors[element] = null
+        }else{
+          for(let incentive of this.errors.incentives){
+            incentive.name = null;
+            incentive.comment = null;
+            for(let option of incentive.options){
+              option.name = null;
+            }
+          }
+        }
       }
       this.incentiveErrors = null;
 
@@ -519,19 +553,27 @@ export default {
       }
 
       if(this.toggleIncentives){
-        for(let incentive of this.form.incentives){
-          if(incentive.comment === '' || incentive.name === ''){
+        for(let idx in this.form.incentives){
+          const incentive = this.form.incentives[idx];
+
+          if(incentive.comment === ''){
+            this.errors.incentives[idx].comment = 'Campo obrigatório'
+            validationCheck = false
             this.incentiveErrors = 'Incentivos inválidos';
-            validationCheck = false;
-            continue;
           }
+          if(incentive.name === ''){
+            this.errors.incentives[idx].name = 'Campo obrigatório'
+            validationCheck = false
+            this.incentiveErrors = 'Incentivos inválidos';
+          }
+
           if(incentive.type === 'private'){
-            console.log('private');
-            for(let option of incentive.options){
+            for(let option_idx in incentive.options){
+              const option = incentive.options[option_idx]
               if(option.name === ''){
+                this.errors.incentives[idx].options[option_idx].name = 'Campo obrigatório';
                 this.incentiveErrors = 'Incentivos inválidos';
                 validationCheck = false;
-                continue;
               }
             }
           }
@@ -541,7 +583,7 @@ export default {
       if (!validationCheck){
         this.errorMessage = 'Os seguintes campos estão inválidos: ';
         for(let error in this.errors){
-          if(this.errors[error]) this.errorMessage = this.errorMessage + `<br><small><i class="fa fa-circle"></i></small> ` + this.errors[error];
+          if(this.errors[error] && error !== 'incentives') this.errorMessage = this.errorMessage + `<br><small><i class="fa fa-circle"></i></small> ` + this.errors[error];
         }
         this.errorMessage += `<br><small><i class="fa fa-circle"></i></small> ` + this.incentiveErrors;
         document.getElementById('error-block').innerHTML = `<div role="alert" aria-live="polite" aria-atomic="true" class="alert alert-sm alert-danger">${this.errorMessage}</div>`;
@@ -555,15 +597,19 @@ export default {
     },
     minusIncentive(idx){
       this.form.incentives.splice(idx, 1);
+      this.errors.incentives.splice(idx, 1);
     },
     plusIncentive(){
       this.form.incentives.push({type: 'none', comment: '', name: '', options: [{ name: '' }]});
+      this.errors.incentives.push({ comment: null, name: null, options: [{ name: null }]});
     },
     addOption(idx){
       this.form.incentives[idx].options.push({name: ''});
+      this.errors.incentives[idx].options.push({name: null});
     },
     removeOption(idx, option_idx){
       this.form.incentives[idx].options.splice(option_idx, 1);
+      this.errors.incentives[idx].options.splice(option_idx, 1);
     },
 
     //Loading modal
@@ -610,6 +656,7 @@ export default {
       permissions: state => state.permissions,
       userList: state => state.userList,
       newRunLoad: state => state.newRunLoad,
+      eventsList: state => state.eventsList,
     }),
   },
   async created(){
@@ -619,6 +666,9 @@ export default {
       this.items.push(this.gamesList[game].name);
     }
     wsPayload = {"endpoint":"getUsers", "id":this.curReq};
+    this.$store.commit('layout/SOCKET_SEND', wsPayload);
+    
+    wsPayload = {"endpoint":"getEvents", "id":this.curReq};
     this.$store.commit('layout/SOCKET_SEND', wsPayload);
   },
   mounted(){
@@ -680,6 +730,12 @@ export default {
 
 /* Input Validation    */
 input.invalid{
+  border-color: #800000;
+  border-width: 3px;
+  z-index: 3;
+}
+
+textarea.invalid{
   border-color: #800000;
   border-width: 3px;
   z-index: 3;

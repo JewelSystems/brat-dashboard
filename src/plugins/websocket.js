@@ -54,6 +54,7 @@ export default function websocket(){
             store.commit('layout/updateSubmitRun', payload.data);
             break;
           case "updateSubmitRunNRunIncentives":
+            console.log(payload.data);
             store.commit('layout/updateSubmitRunIncentives', payload.data);
             break;
           case "refuseSubmitRunNRemoveIncentives":

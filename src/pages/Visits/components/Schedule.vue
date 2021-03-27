@@ -158,7 +158,6 @@
                   <th>Plataforma</th>
                   <th>Runner</th>
                   <th></th>
-                  <th></th>
                 </tr>
               </thead>
               <draggable 
@@ -175,6 +174,8 @@
                   <td class="align-middle"> {{ row.id }}</td>
                   <td class="align-middle"> {{ formatHorary(row.event_date, row.duration, row.extra_time) }}</td>
                   <td class="align-middle"> {{ row.order }} - {{ row.game }} </td>
+                  <td class="align-middle"> {{ formatInterval(row.duration) }}</td>
+                  <!--
                   <td class="align-middle" v-if="row.type !== 'setup' || !dragEnabled"> {{ formatInterval(row.duration) }}</td>
                   <td class="align-middle" v-else>
                     <input
@@ -186,6 +187,7 @@
                       step='1'
                     />
                   </td>
+                  -->
                   <td class="align-middle"> {{ formatInterval(row.extra_time) }}</td>
                   <td class="align-middle"> {{ (row.category ? row.category:"") }}</td>
                   <td class="align-middle"> {{ (row.interval ? translateInterval(row.interval):"") }} </td>
@@ -197,12 +199,6 @@
                   <td class="align-middle" v-show="dragEnabled" v-if="row.type !== 'setup'"> <b-button @click="addSetup(idx)" variant="dark">Adicionar setup</b-button> </td>
                   <td v-else> </td>
 
-                  <td v-if="row.type === 'run'">
-                    <b-button @click="toggleDonation(row.id)" variant="dark"> Doar </b-button>
-                  </td>
-                  <td v-else></td>
-
-
                   <td class="align-middle" v-show="dragEnabled"><i class="fa fa-times close" @click="removeAt(row.order-1)"></i> </td>
                 </tr>
 
@@ -213,6 +209,7 @@
             <div v-else>A agenda está vazia!</div>
             <div class="clearfix">
               <div class="float-right">
+                <b-button @click="toggleDonation(466)" variant="dark" style="margin-right: 10px">Doar</b-button>
                 <b-button v-show="dragEnabled" @click="newScheduleRow" variant="dark" style="margin-right: 10px">Adicionar agendamento no cronograma</b-button>
                 <b-button v-show="dragEnabled" @click="removeSetups" variant="dark" style="margin-right: 10px">Remover tempos de setup</b-button>
                 <b-button v-show="dragEnabled" @click="addSetups" variant="dark">Adicionar tempos de setup</b-button>

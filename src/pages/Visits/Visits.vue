@@ -97,7 +97,7 @@
             </div>
             <div class="clearfix">
               <div class="float-right">
-                <router-link :to="`/app/submitrun`"><b-button variant="dark">Criar nova run</b-button></router-link>
+                <router-link :to="`/app/submitrun`"><b-button variant="dark">Enviar nova run</b-button></router-link>
               </div>
             </div>
           </div>

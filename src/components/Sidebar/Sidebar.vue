@@ -49,7 +49,7 @@
       />
       <NavLink
         :activeItem="activeItem"
-        header="Criar uma run"
+        header="Enviar uma run"
         link="/app/submitrun"
         iconName="flaticon-home"
         index="submitrun"

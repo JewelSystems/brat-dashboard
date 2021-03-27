@@ -221,6 +221,7 @@ export default {
       }
     },
     newValidation(){
+      const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/; //http://xxxx.xx
       let validationCheck = true;
 
       for(let element in this.errors){
@@ -231,8 +232,8 @@ export default {
         this.errors.newName = 'Campo obrigatório';
         validationCheck = false
       }
-      if(!this.newForm.newDonationLink || /^\s*$/.test(this.newForm.newDonationLink)) {
-        this.errors.newDonationLink = 'Campo obrigatório';
+      if(!this.newForm.newDonationLink || !urlRegex.test(this.newForm.newDonationLink) || this.newForm.newDonationLink.length <= 0) {
+        this.errors.newDonationLink = 'Informe um endereço completo (ex: https://www.google.com/)';
         validationCheck = false
       }
       if(!this.newForm.newStart || /^\s*$/.test(this.newForm.newStart)) {
