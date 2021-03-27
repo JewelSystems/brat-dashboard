@@ -3,7 +3,7 @@
     {{ onReload() }}
     <h1 class="page-title">Envie suas runs! &nbsp;
     </h1>
-    <b-row>
+    <b-row v-if="formTitle">
       <b-col>
         <Widget
           :title="formTitle"
@@ -294,6 +294,9 @@
         </Widget>
       </b-col>
     </b-row>
+    <b-row v-else>
+      Não existe um evento ativo!
+    </b-row>
   </div>
 </template>
 
@@ -387,7 +390,11 @@ export default {
   },
   methods: {
     onReload(){
-      this.formTitle = "<h5>Enviar <span class='fw-semi-bold'>uma run para o evento "+ this.eventsList.find(element => element.active === "A").name +"</span></h5>";
+      if(this.eventsList.find(element => element.active === "A")){
+        this.formTitle = "<h5>Enviar <span class='fw-semi-bold'>uma run para o evento "+ this.eventsList.find(element => element.active === "A").name +"</span></h5>";
+      }else{
+        this.formTitle = null;
+      }
     },
     //Autocomplete Methods
     test(){
