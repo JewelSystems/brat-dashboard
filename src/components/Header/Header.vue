@@ -69,7 +69,9 @@
           </b-dropdown-item-button>
           -->
           <!-- TODO -->
-          <b-dropdown-item>Em construção</b-dropdown-item>
+          <b-dropdown-item>      
+            <router-link :to="`/app/update-user/${id}`">Editar cadastro</router-link>
+          </b-dropdown-item>
         </b-nav-item-dropdown>
 
         <!--
@@ -132,6 +134,7 @@ export default {
       sidebarStatic: state => state.sidebarStatic,
       first_name: state => state.first_name,
       last_name: state => state.last_name,
+      id: state => state.id
     }),
   },
   methods: {

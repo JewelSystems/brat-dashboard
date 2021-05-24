@@ -6,6 +6,7 @@ import Dashboard from '@/pages/Visits/Visits';
 import Admin from '@/pages/Admin/Admin';
 import Login from '@/pages/Login/Login';
 import UserView from '@/pages/UserView/UserView';
+import UpdateUser from '@/pages/UpdateUser/UpdateUser';
 import Signup from '@/pages/Signup/Signup';
 import RunSubmit from '@/pages/RunSubmit/RunSubmit';
 import Events from '@/pages/Events/Events';
@@ -63,6 +64,11 @@ const router = new Router({
           meta:{
             permission: 'Admin',
           }
+        },
+        {
+          path: 'update-user/:id',
+          name: 'UpdateUser',
+          component: UpdateUser,
         },
         {
           path: 'submitrun',
