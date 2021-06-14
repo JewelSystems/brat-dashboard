@@ -99,14 +99,14 @@ export default {
       router.push('/app/dashboard');
     },
     listUsers(state, payload){
-      state.userList = payload[0];
+      if(payload && payload[0]) state.userList = payload[0];
     },
     listGames(state, payload){
-      state.gamesList = payload[0];
+      if(payload && payload[0]) state.gamesList = payload[0];
     },
     //Event
     listEvents(state, payload){
-      state.eventsList = payload[0];
+      if(payload && payload[0]) state.eventsList = payload[0];
     },
     updateEventState(state, payload){
       state.eventsList.filter(element => element.id === payload[0].id)[0].active = payload[0].active;

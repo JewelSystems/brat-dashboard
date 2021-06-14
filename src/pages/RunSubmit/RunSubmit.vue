@@ -393,7 +393,7 @@ export default {
       if(this.eventsList.find(element => element.active === "A")){
         this.formTitle = "<h5>Enviar <span class='fw-semi-bold'>uma run para o evento "+ this.eventsList.find(element => element.active === "A").name +"</span></h5>";
       }else{
-        this.formTitle = null;
+        this.formTitle = '';
       }
     },
     //Autocomplete Methods
@@ -672,8 +672,11 @@ export default {
     for(let game in this.gamesList){
       this.items.push(this.gamesList[game].name);
     }
-    wsPayload = {"endpoint":"getUsers", "id":this.curReq};
-    this.$store.commit('layout/SOCKET_SEND', wsPayload);
+
+    if(this.permissions.includes('Admin')){
+      wsPayload = {"endpoint":"getUsers", "id":this.curReq};
+      this.$store.commit('layout/SOCKET_SEND', wsPayload);
+    }
     
     wsPayload = {"endpoint":"getEvents", "id":this.curReq};
     this.$store.commit('layout/SOCKET_SEND', wsPayload);
