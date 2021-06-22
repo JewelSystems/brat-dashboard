@@ -123,8 +123,8 @@
                      class="form-control input-transparent pl-3"
                      type="text"
                      required
-                     v-mask="'+55(##)#####-####'"
-                     placeholder="+55(__)_____-____"/>
+                     v-mask="'+##(##)#####-####'"
+                     placeholder="+__(__)_____-____"/>
               <i v-show="errors.phone_number" class="la la-exclamation-circle errorspan"></i>
             </b-input-group>
             <small v-show="errors.phone_number" class="errormsg"> {{ errors.phone_number ? errors.phone_number.split(":")[1] : "" }} </small>
