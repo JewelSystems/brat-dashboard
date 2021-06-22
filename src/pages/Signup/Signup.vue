@@ -123,8 +123,11 @@
                      class="form-control input-transparent pl-3"
                      type="text"
                      required
+                     placeholder="Número de telefone"/>
+                     <!--
                      v-mask="'+##(##)#####-####'"
                      placeholder="+__(__)_____-____"/>
+                     -->
               <i v-show="errors.phone_number" class="la la-exclamation-circle errorspan"></i>
             </b-input-group>
             <small v-show="errors.phone_number" class="errormsg"> {{ errors.phone_number ? errors.phone_number.split(":")[1] : "" }} </small>
@@ -429,7 +432,7 @@ export default {
         this.errors.birthday = 'Data de nascimento: Valor inválido';
         validationCheck = false
       }
-      if(!this.form.phone_number || this.form.phone_number.length < 16) {
+      if(!this.form.phone_number /*|| this.form.phone_number.length < 16*/) {
         this.errors.phone_number = 'Telefone: Número inválido';
         validationCheck = false
       } 
