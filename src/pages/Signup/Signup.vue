@@ -432,7 +432,7 @@ export default {
         this.errors.birthday = 'Data de nascimento: Valor inválido';
         validationCheck = false
       }
-      if(!this.form.phone_number /*|| this.form.phone_number.length < 16*/) {
+      if(!this.form.phone_number || this.form.phone_number.length > 25 /*|| this.form.phone_number.length < 16*/) {
         this.errors.phone_number = 'Telefone: Número inválido';
         validationCheck = false
       } 
