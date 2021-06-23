@@ -11,5 +11,16 @@ export default {
       }
     });
     return response;
+  },
+
+  async checkToken(token){
+    const response = await axios.post(process.env.VUE_APP_HTTP_ADDRESS+'/token' || 'http://localhost:3000/token', {
+      token: token,
+      }).catch(function (error){
+        if(error.response){
+          return error.response;
+        }
+      });
+      return response;
   }
 }

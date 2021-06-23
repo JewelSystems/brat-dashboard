@@ -9,6 +9,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import AuthService from './service/AuthService';
 export default {
   name: 'App',
   methods:{
@@ -29,9 +30,13 @@ export default {
     //console.log(this.wsState);
 
     if (window.localStorage.getItem('authenticated') === 'true' && window.localStorage.getItem('curUser')) {
-      await this.loadUser(window.localStorage.getItem('curUser'));
-      const wsPayload = {"endpoint":"login", "id":this.curReq, "info":{"token": window.localStorage.getItem('token')}};
-      await this.$store.commit('layout/SOCKET_SEND', wsPayload);
+      let response = await AuthService.checkToken(window.localStorage.getItem('token'));
+      console.log(response);
+      if(response.status === 200){
+        await this.loadUser(window.localStorage.getItem('curUser'));
+        const wsPayload = {"endpoint":"login", "id":this.curReq, "info":{"token": window.localStorage.getItem('token')}};
+        this.$store.commit('layout/SOCKET_SEND', wsPayload);
+      }
     }
     if (currentPath === '/') {
       this.$router.push('/login');
