@@ -70,7 +70,7 @@
           -->
           <!-- TODO -->
           <b-dropdown-item>      
-            <router-link :to="`/app/update-user/${id}`">Editar cadastro</router-link>
+            <!-- <router-link :to="`/app/update-user/${id}`">Editar cadastro</router-link> -->
           </b-dropdown-item>
         </b-nav-item-dropdown>
 
