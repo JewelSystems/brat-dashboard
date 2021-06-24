@@ -98,9 +98,10 @@
                   <small>Indique a categoria que você pode fazer (ex: 100%, Any%).</small>
                 </b-form-group>
               </b-col>
-              <b-col cols="6">
+              <b-col cols="4">
                 <b-form-group label="Tempo Estimado" label-for="estimatedTime">
                   <b-input-group>
+                    <!--
                     <input id="estimatedTime"
                           v-model="form.estimatedTime" 
                           v-bind:class="{ invalid: errors.estimatedTime !== null }"
@@ -112,6 +113,35 @@
                           step='1'
                           min="00:00:00" max="24:00:00"
                           />
+                      -->
+                      
+                    <input id="hour"
+                          v-model="hours" 
+                          v-bind:class="{ invalid: errors.estimatedTime !== null }"
+                          ref="estimatedTime"
+                          class="form-control input-transparent pl-3"
+                          type="number"
+                          required
+                          />
+                    <p style="margin-top: 7px; padding-right: 10px; padding-left: 5px">Horas</p>
+                    <input id="minutes"
+                          v-model="minutes" 
+                          v-bind:class="{ invalid: errors.estimatedTime !== null }"
+                          ref="estimatedTime"
+                          class="form-control input-transparent pl-3"
+                          type="number"
+                          required
+                          />
+                    <p style="margin-top: 7px; padding-right: 10px; padding-left: 5px">Minutos</p>
+                    <input id="seconds"
+                          v-model="seconds" 
+                          v-bind:class="{ invalid: errors.estimatedTime !== null }"
+                          ref="estimatedTime"
+                          class="form-control input-transparent pl-3"
+                          type="number"
+                          required
+                          />
+                    <p style="margin-top: 7px; padding-right: 10px; padding-left: 5px">Segundos</p>
                   </b-input-group>
                   <small v-show="errors.estimatedTime" class="errormsg"> {{ errors.estimatedTime ? errors.estimatedTime.split(":")[1] : "" }} <br></small>
                   <small>
@@ -308,6 +338,11 @@ export default {
   name: 'RunSubmit',
   data() {
     return {
+      //Time
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+
       //Table title
       formTitle: '',
         
@@ -453,11 +488,14 @@ export default {
     async submit() {
       if(this.inputValidation()){
 
+        /*
         let formatTime = this.form.estimatedTime.split(':');
         let estimatedSeconds = 0;
         if(formatTime[0]) estimatedSeconds += Number(formatTime[0]) * 3600;
         if(formatTime[1]) estimatedSeconds += Number(formatTime[1]) * 60;
         if(formatTime[2]) estimatedSeconds += Number(formatTime[2]);
+        */
+        let estimatedSeconds = this.hours * 3600 + this.minutes * 60 + this.seconds;
 
         for(let game in this.gamesList){
           if(this.form.gameName === this.gamesList[game].name){
@@ -550,7 +588,8 @@ export default {
         this.errors.category = 'Categoria: Campo obrigatório';
         validationCheck = false
       }
-      if(!this.form.estimatedTime || /^\s*$/.test(this.form.estimatedTime)) {
+      //if(!this.form.estimatedTime || /^\s*$/.test(this.form.estimatedTime)) {
+      if(this.hours <= 0 && this.minutes <= 0 && this.seconds <= 0){
         this.errors.estimatedTime = 'Tempo estimado: Campo obrigatório';
         validationCheck = false
       }
@@ -624,6 +663,9 @@ export default {
       this.selectedUser = null;
       this.form.category = '',
       this.form.estimatedTime = '',
+      this.hours = 0;
+      this.minutes = 0;
+      this.seconds = 0;
       this.form.timeSlot = '',
       this.form.platform = '',
 
@@ -761,5 +803,17 @@ textarea.invalid{
 }
 .errormsg {
   color: red
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 </style>
