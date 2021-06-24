@@ -31,7 +31,6 @@ export default {
 
     if (window.localStorage.getItem('authenticated') === 'true' && window.localStorage.getItem('curUser')) {
       let response = await AuthService.checkToken(window.localStorage.getItem('token'));
-      console.log(response);
       if(response.status === 200){
         await this.loadUser(window.localStorage.getItem('curUser'));
         const wsPayload = {"endpoint":"login", "id":this.curReq, "info":{"token": window.localStorage.getItem('token')}};

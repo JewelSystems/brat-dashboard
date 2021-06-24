@@ -101,6 +101,10 @@ export default function websocket(){
           case "getEventRuns":
             store.commit('layout/listEventRuns', payload.data[0]);
             break;
+          // User
+          case "updateUser":
+            store.dispatch('layout/loadUser', payload.data[0]);
+            break;
           default:
             console.log("Mensagem do servidor: ", payload);
             //store.commit('receiveData', payload);
